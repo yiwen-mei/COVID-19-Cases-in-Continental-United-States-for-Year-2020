@@ -1,0 +1,32 @@
+---
+title: "COVID-19-Cases-in-Continental-United-States-for-Year-2020"
+author: "Yiwen Mei"
+date: "2023-04-26"
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r}
+library(ggmap)
+library(ggplot2)
+library(maps)
+library(dplyr)
+
+# read csv file
+d3 = read.csv("usmap.csv")
+
+# data preprocessing
+d3 = d3[d3$lon > -130,] 
+d3 = d3[d3$cases > 22,] # ignore counties with small number of cases
+d3$cases = 100000*d3$cases/d3$population # cases per 100000 residents
+
+# generate the US map
+us <- c(left = -126, bottom = 24.25, right = -67, top = 49.5)
+US.map = get_stamenmap(us, zoom = 5, maptype = "toner-lite")
+ggmap(US.map) + geom_point(data = d3, aes(x = lon, y = lat, size = 100*cases), 
+                           alpha = 0.3, 
+                           color = "brown") + theme(legend.position = "none") 
+```
